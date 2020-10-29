@@ -20,8 +20,8 @@ class BookingDialog extends CancelAndHelpDialog {
             .addDialog(new ConfirmPrompt(CONFIRM_PROMPT))
             .addDialog(new DateResolverDialog(DATE_RESOLVER_DIALOG))
             .addDialog(new WaterfallDialog(WATERFALL_DIALOG, [
-                this.destinationStep.bind(this),
                 this.originStep.bind(this),
+                this.destinationStep.bind(this),
                 this.travelDateStep.bind(this),
                 this.confirmStep.bind(this),
                 this.finalStep.bind(this)
@@ -36,8 +36,9 @@ class BookingDialog extends CancelAndHelpDialog {
     async destinationStep(stepContext) {
         const bookingDetails = stepContext.options;
 
+        bookingDetails.origin = stepContext.result;
         if (!bookingDetails.destination) {
-            const messageText = 'To what city would you like to travel?';
+            const messageText = "What is the address for the location needing inspection?";
             const msg = MessageFactory.text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.prompt(TEXT_PROMPT, { prompt: msg });
         }
@@ -49,12 +50,10 @@ class BookingDialog extends CancelAndHelpDialog {
      */
     async originStep(stepContext) {
         const bookingDetails = stepContext.options;
-
         // Capture the response to the previous step's prompt
-        bookingDetails.destination = stepContext.result;
         if (!bookingDetails.origin) {
-            const messageText = 'From what city will you be travelling?';
-            const msg = MessageFactory.text(messageText, 'From what city will you be travelling?', InputHints.ExpectingInput);
+            const messageText = "Now let’s get you started with booking a date for the inspection. What city are you located in?";
+            const msg = MessageFactory.text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.prompt(TEXT_PROMPT, { prompt: msg });
         }
         return await stepContext.next(bookingDetails.origin);
@@ -68,7 +67,7 @@ class BookingDialog extends CancelAndHelpDialog {
         const bookingDetails = stepContext.options;
 
         // Capture the results of the previous step
-        bookingDetails.origin = stepContext.result;
+        bookingDetails.destination = stepContext.result;
         if (!bookingDetails.travelDate || this.isAmbiguous(bookingDetails.travelDate)) {
             return await stepContext.beginDialog(DATE_RESOLVER_DIALOG, { date: bookingDetails.travelDate });
         }
@@ -83,7 +82,7 @@ class BookingDialog extends CancelAndHelpDialog {
 
         // Capture the results of the previous step
         bookingDetails.travelDate = stepContext.result;
-        const messageText = `Please confirm, I have you traveling to: ${ bookingDetails.destination } from: ${ bookingDetails.origin } on: ${ bookingDetails.travelDate }. Is this correct?`;
+        const messageText = `Please confirm, you would like an asbestos inspection on ${ bookingDetails.travelDate } at the address ${ bookingDetails.destination } in ${ bookingDetails.origin }. Is this correct?`;
         const msg = MessageFactory.text(messageText, messageText, InputHints.ExpectingInput);
 
         // Offer a YES/NO prompt.

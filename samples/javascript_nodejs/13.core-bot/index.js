@@ -25,6 +25,9 @@ const { MainDialog } = require('./dialogs/mainDialog');
 // the bot's booking dialog
 const { BookingDialog } = require('./dialogs/bookingDialog');
 const BOOKING_DIALOG = 'bookingDialog';
+// the bot's insurance dialog
+const { InsuranceDialog } = require('./dialogs/insuranceDialog');
+const INSURANCE_DIALOG = 'insuranceDialog';
 
 // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about adapters.
@@ -79,7 +82,8 @@ const luisRecognizer = new FlightBookingRecognizer(luisConfig);
 
 // Create the main dialog.
 const bookingDialog = new BookingDialog(BOOKING_DIALOG);
-const dialog = new MainDialog(luisRecognizer, bookingDialog);
+const insuranceDialog = new InsuranceDialog(INSURANCE_DIALOG)
+const dialog = new MainDialog(luisRecognizer, bookingDialog, insuranceDialog);
 const bot = new DialogAndWelcomeBot(conversationState, userState, dialog);
 
 // Create HTTP server
